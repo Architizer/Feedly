@@ -43,3 +43,5 @@ class AggregatedActivity(BaseActivity):
     created_at = columns.DateTime(required=False)
     group = columns.Ascii(required=False)
     updated_at = columns.DateTime(required=False)
+    seen_at = columns.DateTime(required=False)
+    read_at = columns.DateTime(required=False)

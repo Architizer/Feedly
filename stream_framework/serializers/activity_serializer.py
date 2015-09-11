@@ -34,17 +34,17 @@ class ActivitySerializer(BaseSerializer):
             if six.PY3:
                 pickle_string = pickle_string.decode('latin1')
         parts += [activity_time, pickle_string]
-        serialized_activity = ','.join(map(str, parts))
+        serialized_activity = '|'.join(map(str, parts))
         return serialized_activity
 
     def loads(self, serialized_activity):
-        parts = serialized_activity.split(',')
+        parts = serialized_activity.split('|')
         # convert these to ids
         actor_id, verb_id, object_id, target_id = map(
             int, parts[:4])
         activity_datetime = epoch_to_datetime(float(parts[4]))
         # just in case the original pickle_string contains a comma
-        pickle_string = ','.join(parts[5:])
+        pickle_string = '|'.join(parts[5:])
         if not target_id:
             target_id = None
         verb = get_verb_by_id(verb_id)

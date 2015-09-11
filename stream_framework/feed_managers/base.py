@@ -110,7 +110,7 @@ class Manager(object):
 
     metrics = get_metrics_instance()
 
-    def get_user_follower_ids(self, user_id):
+    def get_user_follower_ids(self, user_id, activity=None):
         '''
         Returns a dict of users ids which follow the given user grouped by
         priority/importance
@@ -141,7 +141,7 @@ class Manager(object):
         user_feed.add(activity)
         operation_kwargs = dict(activities=[activity], trim=True)
 
-        for priority_group, follower_ids in self.get_user_follower_ids(user_id=user_id).items():
+        for priority_group, follower_ids in self.get_user_follower_ids(user_id=user_id, activity=activity).items():
             # create the fanout tasks
             for feed_class in self.feed_classes.values():
                 self.create_fanout_tasks(
@@ -168,7 +168,7 @@ class Manager(object):
         # no need to trim when removing items
         operation_kwargs = dict(activities=[activity], trim=False)
 
-        for priority_group, follower_ids in self.get_user_follower_ids(user_id=user_id).items():
+        for priority_group, follower_ids in self.get_user_follower_ids(user_id=user_id, activity=activity).items():
             for feed_class in self.feed_classes.values():
                 self.create_fanout_tasks(
                     follower_ids,
@@ -376,6 +376,8 @@ class Manager(object):
         logger.info('processing %s items in %s chunks of %s',
                     len(activities), len(activity_chunks), chunk_size)
 
+        logger.warning('cannot fan out to activity followers on batch import, \
+            please import activities individually')
         for index, activity_chunk in enumerate(activity_chunks):
             # first insert into the global activity storage
             self.user_feed_class.insert_activities(activity_chunk)
@@ -389,7 +391,8 @@ class Manager(object):
             if fanout:
                 logger.info('starting task fanout for chunk %s', index)
                 follower_ids_by_prio = self.get_user_follower_ids(
-                    user_id=user_id)
+                    user_id=user_id,
+                    activity=None)
                 # create the fanout tasks
                 operation_kwargs = dict(activities=activity_chunk, trim=False)
                 for feed_class in self.feed_classes.values():

@@ -16,7 +16,9 @@ class CassandraAggregatedActivitySerializer(AggregatedActivitySerializer):
             activities=activities,
             group=aggregated.group,
             created_at=aggregated.created_at,
-            updated_at=aggregated.updated_at
+            updated_at=aggregated.updated_at,
+            seen_at=aggregated.seen_at,
+            read_at=aggregated.read_at
         )
         return model_instance
 
@@ -27,5 +29,7 @@ class CassandraAggregatedActivitySerializer(AggregatedActivitySerializer):
             activities=activities,
             created_at=serialized_aggregated.created_at,
             updated_at=serialized_aggregated.updated_at,
+            seen_at=serialized_aggregated.seen_at,
+            read_at=serialized_aggregated.read_at
         )
         return aggregated
