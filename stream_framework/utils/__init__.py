@@ -44,14 +44,23 @@ def chunks(iterable, n=10000):
         yield chunk
 
 
+def get_django_tz_delta():
+    try:
+        from django.utils import timezone
+        return timezone.get_current_timezone().utcoffset(timezone.now())
+    except ImportError:
+        return timedelta(0)
+
+
 epoch = datetime(1970, 1, 1)
+django_tz_delta = get_django_tz_delta()
 
 
 def datetime_to_epoch(dt):
     '''
     Convert datetime object to epoch with millisecond accuracy
     '''
-    delta = dt - epoch
+    delta = dt - epoch - django_tz_delta
     since_epoch = delta.total_seconds()
     return since_epoch
 
